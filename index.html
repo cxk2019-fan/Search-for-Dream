@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>抓娃娃计划 - 入梦探险记</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Rounded MT Bold', 'Segoe UI', sans-serif;
+        }
+        
+        :root {
+            --primary-pink: #FFB7C5;
+            --light-pink: #FFE4E9;
+            --soft-purple: #D8BFD8;
+            --light-purple: #E6E6FA;
+            --cream-yellow: #FFFACD;
+            --warm-yellow: #FFECB3;
+            --text-dark: #5A4A6A;
+            --gold: #FFD700;
+            --moon-blue: #7BB6E0;
+            --star-pink: #FF8E9E;
+            --gift-red: #FF6B8B;
+            --gift-green: #6BCC8B;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--cream-yellow) 0%, var(--light-pink) 50%, var(--light-purple) 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 15px;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .bg-floating {
+            position: fixed;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .bg-floating.star {
+            width: 4px;
+            height: 4px;
+            background: var(--star-pink);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: floatStar 20s infinite linear;
+            opacity: 0.6;
+        }
+        
+        .bg-floating.moon {
+            width: 30px;
+            height: 30px;
+            background: var(--moon-blue);
+            border-radius: 50%;
+            animation: floatMoon 30s infinite linear;
+            opacity: 0.2;
+            box-shadow: 0 0 15px var(--moon-blue);
+        }
+        
+        .bg-floating.heart {
+            width: 15px;
+            height: 15px;
+            background: var(--primary-pink);
+            clip-path: polygon(50% 0%, 100% 35%, 82% 100%, 50% 75%, 18% 100%, 0% 35%);
+            animation: floatHeart 40s infinite linear;
+            opacity: 0.3;
+        }
+        
+        @keyframes floatStar {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(100vw, 100vh) rotate(360deg); }
+        }
+        
+        @keyframes floatMoon {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(30vw, 40vh) rotate(90deg); }
+            50% { transform: translate(60vw, 20vh) rotate(180deg); }
+            75% { transform: translate(20vw, 60vh) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+        
+        @keyframes floatHeart {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(40vw, 30vh) scale(1.2); }
+            66% { transform: translate(20vw, 50vh) scale(0.8); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px 15px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(255, 183, 197, 0.3);
+            border: 3px solid var(--primary-pink);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--star-pink), var(--soft-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .title-decoration-text {
+            font-size: 1.8rem;
+            margin: 0 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--soft-purple);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .theme-text {
+            font-size: 1.1rem;
+            color: var(--star-pink);
+            background: rgba(255, 255, 255, 0.7);
+            padding: 6px 15px;
+            border-radius: 15px;
+            display: inline-block;
+            border: 2px dashed var(--primary-pink);
+        }
+        
+        .current-time {
+            font-size: 1.1rem;
+            color: var(--star-pink);
+            background: rgba(255, 255, 255, 0.7);
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            border: 2px dashed var(--primary-pink);
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .claw-machine-container {
+            background: linear-gradient(180deg, #FFB7C5 0%, #FF8E9E 100%);
+            border-radius: 20px;
+            padding: 20px 15px;
+            box-shadow: 0 15px 25px rgba(255, 142, 158, 0.4);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 5px solid white;
+        }
+        
+        .machine-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 2px solid var(--warm-yellow);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .energy-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 70%;
+        }
+        
+        .energy-label {
+            font-size: 1rem;
+            color: var(--star-pink);
+            font-weight: bold;
+        }
+        
+        .energy-bar-container {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid var(--primary-pink);
+            position: relative;
+        }
+        
+        .energy-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--star-pink), var(--soft-purple));
+            border-radius: 8px;
+            transition: width 1s ease-out;
+        }
+        
+        .energy-text {
+            font-weight: bold;
+            color: var(--star-pink);
+            font-size: 1.3rem;
+        }
+        
+        .claw-window {
+            background: radial-gradient(circle at center, rgba(123, 182, 224, 0.2) 0%, rgba(255, 255, 255, 0.6) 70%);
+            border: 3px solid white;
+            border-radius: 15px;
+            height: 220px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .window-glass {
+            position: absolute;
+            top: 0;left: 0;width: 100%;height: 100%;background: rgba(255,255,255,0.1);z-index:1;
+        }
+        
+        .claw-system {
+            position: absolute;
+            top: 0;left: 50%;transform: translateX(-50%);width: 80px;height: 100%;z-index: 2;
+        }
+        
+        .claw-rail {
+            position: absolute;top:15px;left:50%;transform: translateX(-50%);width:4px;height:150px;background:var(--text-dark);
+        }
+        
+        .claw-arm {
+            position: absolute;top:15px;left:50%;transform: translateX(-50%);width:50px;height:80px;transition: top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);z-index:3;
+        }
+        
+        .claw-head {
+            position: absolute;top:0;left:50%;transform: translateX(-50%);width:35px;height:15px;background:var(--text-dark);border-radius:8px 8px 0 0;display:flex;justify-content:space-between;padding:0 4px;
+        }
+        
+        .claw-claw {
+            width:8px;height:30px;background:var(--text-dark);border-radius:4px;position:absolute;top:15px;transition:transform 0.3s ease;
+        }
+        .claw-claw.left {left:4px;transform-origin:top center;transform:rotate(-20deg);}
+        .claw-claw.right {right:4px;transform-origin:top center;transform:rotate(20deg);}
+        .claw-claw.grab {transform: rotate(0deg);}
+
+        /* 少女风礼物盒 — 初始在底部，被爪子夹持跟随移动 */
+        .prize-doll {
+            position:absolute;width:70px;height:90px;bottom:20px;left:50%;transform:translateX(-50%);
+            transition: all 0.8s ease;
+            z-index:2;
+            /* 抓取时跟随爪子定位 */
+        }
+        /* 礼盒开盖动画 */
+        .prize-doll.open .gift-lid{
+            transform: translateY(-15px) rotate(-10deg);
+        }
+        .gift-box{position:relative;width:100%;height:100%;}
+        .gift-body{position:absolute;width:55px;height:48px;background:linear-gradient(135deg,#ffc8d8,#ff9fb3);border-radius:8px;top:32px;left:8px;border:2px solid white;}
+        .gift-lid{position:absolute;width:65px;height:14px;background:linear-gradient(135deg,#f8c8e0,#e8a8c8);border-radius:8px 8px 0 0;top:17px;left:3px;border:2px solid white;border-bottom:none;transition:transform 0.6s ease;}
+        .gift-bow{position:absolute;width:28px;height:28px;top:0;left:21px;}
+        .bow-center{position:absolute;width:14px;height:14px;background:var(--star-pink);border-radius:50%;top:7px;left:7px;z-index:2;}
+        .bow-loop{position:absolute;width:24px;height:14px;background:var(--star-pink);border-radius:50%;}
+        .bow-loop.left{top:4px;left:0;transform:rotate(-30deg);}
+        .bow-loop.right{top:4px;right:0;transform:rotate(30deg);}
+        .bow-tail{position:absolute;width:10px;height:22px;background:var(--star-pink);border-radius:8px;top:15px;}
+        .bow-tail.left{left:4px;transform:rotate(-20deg);}
+        .bow-tail.right{right:4px;transform:rotate(20deg);}
+        .gift-ribbon{position:absolute;width:6px;height:48px;background:#ffb8cc;border-radius:4px;top:32px;}
+        .gift-ribbon.vertical{left:32px;}
+        .gift-ribbon.horizontal{width:55px;height:6px;top:56px;left:8px;}
+
+        /* 核心：盒内弹出悬浮时间打卡卡片 */
+        .time-card{
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%,20px) scale(0);
+            opacity: 0;
+            background: linear-gradient(135deg,#fff9e8,var(--gold));
+            padding: 8px 12px;
+            border-radius: 10px;
+            box-shadow: 0 0 12px var(--gold);
+            font-weight: bold;
+            color: #5A4A6A;
+            white-space: nowrap;
+            z-index: 10;
+            transition: all 0.7s cubic-bezier(0.2,1.3,0.3,1);
+        }
+        .time-card.show{
+            opacity:1;
+            transform: translate(-50%,-40px) scale(1.1);
+        }
+
+        .coin-grid-section {
+            background: rgba(255,255,255,0.9);padding:20px 15px;border-radius:15px;margin:15px 0;border:3px solid var(--primary-pink);
+        }
+        .grid-title{text-align:center;color:var(--star-pink);margin-bottom:15px;font-size:1.3rem;}
+        .coin-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;max-width:350px;margin:0 auto;}
+        .coin-slot{aspect-ratio:1;background:rgba(255,255,255,0.8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:rgba(90,74,106,0.3);border:2px solid var(--primary-pink);position:relative;}
+        .coin-slot::before{content:'';position:absolute;width:80%;height:80%;border:2px dashed var(--soft-purple);border-radius:50%;}
+        .coin-slot.filled{background:var(--gold);color:white;border-color:#FFA500;transform:scale(1.1);box-shadow:0 0 15px var(--gold);}
+
+        .claw-button-section{text-align:center;margin:20px 0;}
+        .claw-button {
+            background: linear-gradient(135deg, var(--gift-red), var(--star-pink));
+            color: white;border:none;border-radius:50px;padding:15px 30px;font-size:1.3rem;font-weight:bold;
+            cursor:pointer;box-shadow:0 8px 20px rgba(255,107,139,0.4);transition:all 0.3s ease;
+            display:inline-flex;align-items:center;gap:10px;
+            touch-action: manipulation;-webkit-tap-highlight-color:transparent;
+            pointer-events: auto !important;
+        }
+        .claw-button:active{transform:translateY(-3px) scale(1.05);}
+
+        /* 隐藏原来底部旧反馈卡片 */
+        .feedback-card{display:none !important;}
+
+        .time-hint{text-align:center;color:var(--star-pink);font-size:1.1rem;margin:10px 0;font-weight:bold;}
+        .dynamic-hint{text-align:center;padding:20px 15px;background:rgba(255,255,255,0.9);border-radius:15px;margin:15px 0;font-size:1.3rem;color:var(--star-pink);border:3px solid var(--primary-pink);font-weight:bold;}
+        .tool-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:15px 0;}
+        .tool-btn{padding:15px 8px;border:none;border-radius:12px;cursor:pointer;font-size:1rem;font-weight:bold;touch-action:manipulation;}
+        .tool-btn.ticket{background:linear-gradient(135deg,var(--moon-blue),#7BB6E0);color:white;}
+        .tool-btn.reminder{background:linear-gradient(135deg,var(--soft-purple),#D8BFD8);color:white;}
+        .tool-btn.reset{background:#FF6B6B;color:white;}
+        .stats-section{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:15px 0;}
+        .stat-card{background:rgba(255,255,255,0.9);padding:20px 10px;border-radius:15px;text-align:center;border:3px solid var(--primary-pink);}
+        .stat-value{font-size:2.2rem;font-weight:bold;color:var(--star-pink);margin-bottom:5px;}
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center;padding:15px;}
+        .modal-content{background:linear-gradient(135deg,white,var(--light-pink));padding:30px 20px;border-radius:20px;text-align:center;border:4px solid var(--primary-pink);}
+        .modal-close{background:var(--star-pink);color:white;padding:12px 30px;border:none;border-radius:25px;cursor:pointer;font-size:1.2rem;}
+        .footer{text-align:center;margin-top:20px;padding:15px;color:var(--soft-purple);font-size:0.9rem;border-top:2px dashed var(--primary-pink);}
+
+        @keyframes breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+        @keyframes shimmer{0%{transform:translateX(-100%);}100%{transform:translateX(100%);}}
+        @keyframes modalPop{to{transform:scale(1);}}
+        @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0.7);}50%{box-shadow:0 0 0 10px rgba(255,215,0,0);}}
+        @keyframes messageSlide{0%{transform:translateX(-50%) translateY(-100px);opacity:0;}20%{transform:translateX(-50%) translateY(0);opacity:1;}80%{opacity:1;}100%{opacity:0;}}
+    </style>
+</head>
+<body>
+    <div id="bgContainer"></div>
+    <div class="container">
+        <div class="header">
+            <h1><span class="title-decoration-text">🎀</span> 抓娃娃计划 <span class="title-decoration-text">🎀</span></h1>
+            <div class="subtitle">21天养成早睡好习惯</div>
+            <div class="theme-text">入梦探险记</div>
+            <div class="current-time" id="currentTime"></div>
+        </div>
+
+        <div class="claw-machine-container">
+            <div class="machine-top">
+                <div class="energy-info">
+                    <div class="energy-label">抓爪充能进度</div>
+                    <div class="energy-bar-container">
+                        <div class="energy-bar" id="energyBar"></div>
+                    </div>
+                </div>
+                <div class="energy-text" id="energyText">0/21</div>
+            </div>
+            <div class="claw-window">
+                <div class="window-glass"></div>
+                <div class="claw-system">
+                    <div class="claw-rail"></div>
+                    <div class="claw-arm" id="clawArm">
+                        <div class="claw-head">
+                            <div class="claw-claw left" id="clawLeft"></div>
+                            <div class="claw-claw right" id="clawRight"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 少女风礼物盒 + 内置弹出时间卡片 -->
+                <div class="prize-doll" id="prizeDoll">
+                    <div class="gift-box">
+                        <div class="gift-lid"></div>
+                        <div class="gift-body"></div>
+                        <div class="gift-bow">
+                            <div class="bow-center"></div>
+                            <div class="bow-loop left"></div>
+                            <div class="bow-loop right"></div>
+                            <div class="bow-tail left"></div>
+                            <div class="bow-tail right"></div>
+                        </div>
+                        <div class="gift-ribbon vertical"></div>
+                        <div class="gift-ribbon horizontal"></div>
+                        <!-- 时间成绩悬浮卡片 -->
+                        <div class="time-card" id="timeCard"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="claw-button-section">
+            <button class="claw-button" id="clawButton">
+                <i class="fas fa-gamepad"></i>
+                <span>开始夹娃娃打卡</span>
+            </button>
+        </div>
+
+        <div class="time-hint" id="timeHint">点击上方按钮开始今天的睡眠打卡</div>
+        <div class="feedback-card" id="feedbackCard"></div>
+
+        <div class="dynamic-hint" id="dynamicHint">新手抓爪手报道！今天也要加油投币哦～</div>
+
+        <div class="tool-buttons">
+            <button class="tool-btn ticket" id="ticketBtn"><i class="fas fa-ticket-alt"></i><span>使用假条</span></button>
+            <button class="tool-btn reminder" id="reminderBtn"><i class="fas fa-bell"></i><span>今日提醒</span></button>
+            <button class="tool-btn reset" id="resetBtn"><i class="fas fa-redo"></i><span>重置当天</span></button>
+        </div>
+
+        <div class="coin-grid-section">
+            <h3 class="grid-title">睡梦星球投币孔</h3>
+            <div class="coin-grid" id="coinGrid"></div>
+        </div>
+
+        <div class="stats-section">
+            <div class="stat-card"><div class="stat-value" id="currentStreak">0</div><div class="stat-label">连续打卡天数</div></div>
+            <div class="stat-card"><div class="stat-value" id="safeDays">0</div><div class="stat-label">安全区打卡</div></div>
+            <div class="stat-card"><div class="stat-value" id="remainingDays">21</div><div class="stat-label">剩余天数</div></div>
+            <div class="stat-card"><div class="stat-value" id="ticketCount">2</div><div class="stat-label">剩余假条</div></div>
+        </div>
+        <div class="footer"><p>💤 抓娃娃计划 | 21天早睡打卡</p></div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <div class="modal-icon" id="modalIcon"></div>
+            <h3 class="modal-title" id="modalTitle"></h3>
+            <p class="modal-text" id="modalText"></p>
+            <button class="modal-close" id="modalClose">确定</button>
+        </div>
+    </div>
+
+<script>
+const appData = {
+    currentStreak:0,safeDays:0,tickets:2,energy:0,lastCheckinDate:null,
+    todayChecked:false,todayType:null,todayUsedTicket:false,history:[],todayCheckins:[]
+};
+const sleepTypes = [
+    {type:'perfect',icon:'✨',title:'准时完美',time:'23:00-23:30',energy:2},
+    {type:'safe',icon:'✅',title:'安全早睡',time:'23:30-24:00',energy:1},
+    {type:'late',icon:'🐢',title:'轻微迟到',time:'00:00-00:30',energy:0},
+    {type:'danger',icon:'🔥',title:'高危熬夜',time:'00:30-01:00',energy:-1},
+    {type:'fail',icon:'💥',title:'深夜超时',time:'01:00-03:00',energy:-100}
+];
+const dynamicHints = ["新手抓爪手报道！","坚持努力！","养成好习惯！","过半啦！","冲刺阶段！","最后几天！","🎉 通关成功！"];
+const modalMessages = {
+    perfect:{icon:'✨',title:'超强抓爪！',text:'提前进度，稳稳抓到娃娃！'},
+    safe:{icon:'✅',title:'投币成功！',text:'正常抓取，离目标更近！'},
+    late:{icon:'😣',title:'抓爪打滑',text:'熬夜迟到啦，下次早点！'},
+    danger:{icon:'🔥',title:'机器故障',text:'太晚入睡，需要补能！'},
+    fail:{icon:'💥',title:'抓爪断裂',text:'深度熬夜，可用维修券修复！'},
+    ticket:{icon:'🛠️',title:'维修成功',text:'故障已修复，打卡保留！'},
+    reset:{icon:'🔄',title:'已重置',text:'今日打卡清除，可重新打卡！'},
+    win:{icon:'🎉',title:'恭喜通关！',text:'21天早睡计划圆满完成！'},
+    alreadyChecked:{icon:'⏰',title:'今日已打卡',text:'请勿重复打卡！'},
+    notInTime:{icon:'⏰',title:'不在时段',text:'仅23:00-03:00可以打卡！'}
+};
+
+// 基础工具
+function updateCurrentTime(){
+    const d=new Date();
+    const h=d.getHours().toString().padStart(2,'0');
+    const m=d.getMinutes().toString().padStart(2,'0');
+    const s=d.getSeconds().toString().padStart(2,'0');
+    document.getElementById("currentTime").innerText=`当前时间:${h}:${m}:${s}`;
+}
+function isInCheckinTimeRange(){
+    const h=new Date().getHours();
+    return h>=23||h<3;
+}
+
+const clawArm = document.getElementById("clawArm");
+const clawLeft = document.getElementById("clawLeft");
+const clawRight = document.getElementById("clawRight");
+const prizeDoll = document.getElementById("prizeDoll");
+const timeCard = document.getElementById("timeCard");
+
+// 全新改造：爪子下落 → 夹住礼盒 → 上升 → 开盖 → 弹出时间卡片
+function playClawAnimation(curTimeInfo){
+    // 重置所有状态
+    timeCard.classList.remove("show");
+    prizeDoll.classList.remove("open");
+    prizeDoll.style.transition = "all 0.8s ease";
+
+    // 1. 抓爪下移、夹住礼物
+    clawArm.style.top = "100px";
+    setTimeout(() => {
+        clawLeft.classList.add("grab");
+        clawRight.classList.add("grab");
+        // 礼物吸附到抓爪跟随夹持
+        prizeDoll.style.bottom = "auto";
+        prizeDoll.style.top = "85px";
+
+        // 2. 抓爪带着礼盒整体上升
+        setTimeout(()=>{
+            clawArm.style.top = "15px";
+            prizeDoll.style.top = "25px";
+
+            // 3. 礼盒开盖
+            setTimeout(()=>{
+                prizeDoll.classList.add("open");
+                // 4. 内部金色时间成绩卡片弹出来
+                timeCard.innerText = curTimeInfo;
+                timeCard.classList.add("show");
+            },600);
+        },400);
+    },600);
+}
+
+// 按钮点击主逻辑
+function handleClawBtn(){
+    // 时间前置校验
+    if(!isInCheckinTimeRange()){
+        showModal("notInTime");
+        return;
+    }
+    const now=new Date();
+    const today=now.toDateString();
+    if(appData.lastCheckinDate === today && appData.todayChecked){
+        showModal("alreadyChecked");
+        return;
+    }
+    // 匹配当前作息时段
+    const h=now.getHours(),m=now.getMinutes();
+    let curType="",showTimeStr="";
+    if(h===23&&m<30) {curType="perfect"; showTimeStr="✨ 准时区 23:00-23:30";}
+    else if((h===23&&m>=30) || (h===0&&m===0)) {curType="safe"; showTimeStr="✅ 安全区 23:30-24:00";}
+    else if(h===0&&m<30) {curType="late"; showTimeStr="🐢 迟到区 00:00-00:30";}
+    else if((h===0&&m>=30) || (h===1&&m===0)) {curType="danger"; showTimeStr="🔥 高危区 00:30-01:00";}
+    else if(h>=1&&h<3) {curType="fail"; showTimeStr="💥 失效区 01:00-03:00";}
+
+    // 播放夹持+开盖+弹卡片全套动画
+    playClawAnimation(showTimeStr);
+    setTimeout(()=>{
+        handleCheckinCore(curType);
+        if(appData.energy>=21) setTimeout(()=>showModal("win"),1000);
+    },2200);
+}
+
+// 纯打卡数据核心
+function handleCheckinCore(type){
+    const info=sleepTypes.find(x=>x.type===type);
+    appData.energy=Math.max(0,Math.min(21,appData.energy+info.energy));
+    if(type==="perfect") appData.energy=Math.min(21,appData.energy+1);
+    if(type==="perfect"||type==="safe") appData.safeDays++;
+    const now=new Date();
+    appData.todayChecked=true;appData.todayType=type;
+    appData.lastCheckinDate=now.toDateString();
+    appData.history.push(type);
+    appData.currentStreak=appData.history.length;
+    saveData();updateUI();updateDynamicHint();
+}
+
+// 弹窗、储存、渲染
+function showModal(t){const m=modalMessages[t];if(!m)return;document.getElementById("modalIcon").innerText=m.icon;document.getElementById("modalTitle").innerText=m.title;document.getElementById("modalText").innerText=m.text;document.getElementById("modalOverlay").style.display="flex";}
+function closeModal(){document.getElementById("modalOverlay").style.display="none";}
+function saveData(){localStorage.setItem("sleepData21",JSON.stringify(appData));}
+function loadData(){
+    const s=localStorage.getItem("sleepData21");if(!s)return;
+    const o=JSON.parse(s);const t=new Date().toDateString();
+    if(o.lastCheckinDate!==t){o.todayChecked=false;o.todayType=null;o.todayUsedTicket=false;}
+    Object.assign(appData,o);
+}
+function updateUI(){
+    document.getElementById("energyBar").style.width=(appData.energy/21*100)+"%";
+    document.getElementById("energyText").innerText=`${appData.energy}/21`;
+    document.getElementById("currentStreak").innerText=appData.currentStreak;
+    document.getElementById("safeDays").innerText=appData.safeDays;
+    document.getElementById("remainingDays").innerText=Math.max(0,21-appData.currentStreak);
+    document.getElementById("ticketCount").innerText=appData.tickets;
+    updateCoinSlotView();
+}
+function updateCoinSlotView(){
+    const grid=document.getElementById("coinGrid");grid.innerHTML="";
+    for(let i=0;i<21;i++){
+        const d=document.createElement("div");d.className="coin-slot";
+        d.innerHTML=i<appData.currentStreak?'<i class="fas fa-star"></i>':'<i class="far fa-star"></i>';
+        if(i<appData.currentStreak)d.classList.add("filled");
+        grid.appendChild(d);
+    }
+}
+function updateDynamicHint(){
+    const el=document.getElementById("dynamicHint");
+    if(appData.energy>=21)el.innerText=dynamicHints[6];
+    else if(appData.energy>=14)el.innerText=dynamicHints[5];
+    else if(appData.energy>=10)el.innerText=dynamicHints[4];
+    else if(appData.energy>=5)el.innerText=dynamicHints[3];
+    else el.innerText=dynamicHints[0];
+}
+function useTicket(){
+    if(appData.tickets<=0)return showMsg("没有维修假条了！");
+    if(!appData.todayChecked)return showMsg("今日未打卡，无需修复！");
+    if(appData.todayUsedTicket)return showMsg("今日已用过假条！");
+    appData.tickets--;appData.todayUsedTicket=true;saveData();updateUI();showModal("ticket");
+}
+function resetToday(){
+    const t=new Date().toDateString();
+    if(appData.lastCheckinDate!==t)return showMsg("今日无打卡记录！");
+    appData.history.pop();appData.currentStreak=appData.history.length;
+    appData.todayChecked=false;appData.todayType=null;saveData();updateUI();updateDynamicHint();showModal("reset");
+}
+function showMsg(txt){
+    const e=document.createElement("div");
+    e.style=`position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#0008;color:#fff;padding:10px 20px;border-radius:20px;z-index:9999;animation:messageSlide 2s forwards;`;
+    e.innerText=txt;document.body.appendChild(e);setTimeout(()=>e.remove(),2000);
+}
+
+// 强制绑定事件
+function bindAllEvent(){
+    const btn=document.getElementById("clawButton");
+    btn.onclick=null;
+    btn.addEventListener("click",handleClawBtn);
+    document.getElementById("ticketBtn").onclick=useTicket;
+    document.getElementById("resetBtn").onclick=resetToday;
+    document.getElementById("modalClose").onclick=closeModal;
+    document.getElementById("modalOverlay").addEventListener("click",e=>{if(e.target.id==="modalOverlay")closeModal();});
+}
+
+// 初始化
+function initPure(){
+    loadData();updateCurrentTime();updateUI();updateDynamicHint();bindAllEvent();
+    setInterval(updateCurrentTime,1000);
+}
+document.addEventListener("DOMContentLoaded",initPure);
+</script>
+</body>
+</html>
